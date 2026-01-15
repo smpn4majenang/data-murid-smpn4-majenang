@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Data Siswa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.5); }
+        .nav-link.active { border-bottom: 2px solid #2563eb; color: #2563eb; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="fixed inset-0 flex items-center justify-center z-50 bg-blue-600 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-school text-blue-600 text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Login Sistem</h1>
+                <p class="text-gray-500">Masukkan NPSN untuk mengakses data</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password (NPSN)</label>
+                    <input type="password" id="npsn-input" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="••••••••">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                    Masuk Ke Dashboard
+                </button>
+            </form>
+            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden">NPSN salah. Silakan coba lagi.</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="main-app" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-white border-b border-gray-200 sticky top-0 z-30 no-print">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center space-x-8">
+                        <span class="text-xl font-bold text-blue-600 mr-4 text-nowrap">EduData</span>
+                        <div class="hidden md:flex space-x-4 h-full">
+                            <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-link h-full px-2 pt-1 font-medium text-gray-600 hover:text-blue-600 active">Dashboard</button>
+                            <button onclick="switchPage('siswa')" id="nav-siswa" class="nav-link h-full px-2 pt-1 font-medium text-gray-600 hover:text-blue-600">Daftar Siswa</button>
+                            <button onclick="switchPage('perkelas')" id="nav-perkelas" class="nav-link h-full px-2 pt-1 font-medium text-gray-600 hover:text-blue-600">Data per Kelas</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="logout()" class="text-gray-500 hover:text-red-600 transition-colors">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- DASHBOARD SECTION -->
+            <section id="page-dashboard" class="page-content">
+                <h2 class="text-2xl font-bold mb-6">Ringkasan Statistik</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 font-medium">Total Siswa</p><h3 id="stat-total" class="text-3xl font-bold text-gray-800">0</h3></div>
+                            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg"><i class="fas fa-users text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 font-medium">Laki-laki</p><h3 id="stat-laki" class="text-3xl font-bold text-gray-800">0</h3></div>
+                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fas fa-mars text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 font-medium">Perempuan</p><h3 id="stat-perempuan" class="text-3xl font-bold text-gray-800">0</h3></div>
+                            <div class="p-3 bg-pink-50 text-pink-600 rounded-lg"><i class="fas fa-venus text-xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold mb-4">Statistik per Kelas</h3>
+                    <div id="stats-per-kelas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                </div>
+            </section>
+
+            <!-- DAFTAR SISWA SECTION (Access to Details) -->
+            <section id="page-siswa" class="page-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Identitas Siswa (Akses Detail)</h2>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-input" class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 w-full md:w-80 outline-none" placeholder="Cari Nama / Kelas...">
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 font-semibold uppercase">Nama</th>
+                                    <th class="px-6 py-4 font-semibold uppercase text-center">JK</th>
+                                    <th class="px-6 py-4 font-semibold uppercase text-center">Kelas</th>
+                                    <th class="px-6 py-4 font-semibold uppercase text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siswa-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATA PER KELAS SECTION (Comprehensive View) -->
+            <section id="page-perkelas" class="page-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 no-print">
+                    <h2 class="text-2xl font-bold">Data Lengkap per Kelas</h2>
+                    <div class="flex space-x-2">
+                        <select id="class-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                            <option value="">Pilih Kelas</option>
+                        </select>
+                        <button onclick="window.print()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg"><i class="fas fa-print"></i></button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-[11px] sm:text-xs">
+                            <thead class="bg-gray-800 text-white">
+                                <tr>
+                                    <th class="px-3 py-3 border-r border-gray-700">Nama</th>
+                                    <th class="px-2 py-3 text-center border-r border-gray-700">JK</th>
+                                    <th class="px-3 py-3 text-center border-r border-gray-700">NIS</th>
+                                    <th class="px-3 py-3 text-center border-r border-gray-700">NISN</th>
+                                    <th class="px-3 py-3 border-r border-gray-700">Asal Sekolah</th>
+                                    <th class="px-3 py-3">Tempat Tanggal Lahir</th>
+                                </tr>
+                            </thead>
+                            <tbody id="perkelas-table-body" class="divide-y divide-gray-200">
+                                <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">Silakan pilih kelas terlebih dahulu.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL & DETAIL (Same as before) -->
+    <div id="nis-modal" class="fixed inset-0 z-50 flex items-center justify-center px-4 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="bg-white p-6 rounded-xl shadow-2xl relative z-10 w-full max-w-sm">
+            <h3 class="text-lg font-bold mb-2">Verifikasi Akses</h3>
+            <p class="text-gray-500 text-sm mb-4">Masukkan NIS siswa <span id="target-siswa-name" class="font-bold text-gray-800"></span> untuk melihat detail.</p>
+            <input type="text" id="nis-verify-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan NIS">
+            <div class="flex space-x-2">
+                <button onclick="closeNisModal()" class="flex-1 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">Batal</button>
+                <button onclick="verifyNis()" class="flex-1 py-2 bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-lg">Buka</button>
+            </div>
+            <p id="nis-error" class="text-red-500 text-xs mt-2 hidden text-center">NIS tidak cocok!</p>
+        </div>
+    </div>
+
+    <div id="detail-panel" class="fixed inset-0 z-50 bg-white overflow-y-auto hidden p-4 sm:p-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-8 no-print">
+                <button onclick="closeDetail()" class="flex items-center text-blue-600 font-medium"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
+                <button onclick="window.print()" class="px-4 py-2 bg-gray-100 rounded-lg">Cetak</button>
+            </div>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTdcObZHqy3rFya0rTQVBb7Y3J9Y-66mD57SOHQdqd_yxNua6IdaqhYaDSpKJrhfVGaMzBBN_05vNoT/pub?gid=1808685735&single=true&output=csv';
+        const NPSN_SECRET = "20331749";
+        let allSiswaData = [];
+        let selectedSiswa = null;
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if(document.getElementById('npsn-input').value === NPSN_SECRET) {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            document.getElementById('nav-' + pageId).classList.add('active');
+        }
+
+        async function loadData() {
+            Papa.parse(GOOGLE_SHEET_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    allSiswaData = results.data.filter(row => row.Nama && row.Nama.trim() !== "");
+                    updateDashboard(allSiswaData);
+                    renderTable(allSiswaData);
+                    setupClassFilter(allSiswaData);
+                }
+            });
+        }
+
+        function setupClassFilter(data) {
+            const classes = [...new Set(data.map(s => s.Kelas))].sort();
+            const select = document.getElementById('class-filter');
+            classes.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', (e) => renderPerKelasTable(e.target.value));
+        }
+
+        function renderPerKelasTable(className) {
+            const tbody = document.getElementById('perkelas-table-body');
+            if(!className) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">Silakan pilih kelas terlebih dahulu.</td></tr>';
+                return;
+            }
+            const filtered = allSiswaData.filter(s => s.Kelas === className);
+            tbody.innerHTML = filtered.map(s => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-3 py-3 border-r border-gray-100 font-medium">${s.Nama}</td>
+                    <td class="px-2 py-3 text-center border-r border-gray-100">${s.JK}</td>
+                    <td class="px-3 py-3 text-center border-r border-gray-100 font-mono">${s.NIS}</td>
+                    <td class="px-3 py-3 text-center border-r border-gray-100 font-mono">${s.NISN}</td>
+                    <td class="px-3 py-3 border-r border-gray-100">${s["Sekolah Asal"] || "-"}</td>
+                    <td class="px-3 py-3">${s["Tempat Tanggal Lahir"] || "-"}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('stat-laki').innerText = data.filter(s => s.JK === 'L').length;
+            document.getElementById('stat-perempuan').innerText = data.filter(s => s.JK === 'P').length;
+
+            const kelasGroups = {};
+            data.forEach(s => {
+                const k = s.Kelas || "N/A";
+                if (!kelasGroups[k]) kelasGroups[k] = { L: 0, P: 0, Total: 0 };
+                kelasGroups[k].Total++;
+                if (s.JK === 'L') kelasGroups[k].L++; else if (s.JK === 'P') kelasGroups[k].P++;
+            });
+
+            const container = document.getElementById('stats-per-kelas');
+            container.innerHTML = Object.keys(kelasGroups).sort().map(k => `
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg">
+                    <div class="font-bold text-slate-700 mb-2 border-b border-slate-200 pb-1 text-center">${k}</div>
+                    <div class="flex justify-between text-xs"><span>Laki-laki:</span><span class="font-bold">${kelasGroups[k].L}</span></div>
+                    <div class="flex justify-between text-xs"><span>Perempuan:</span><span class="font-bold">${kelasGroups[k].P}</span></div>
+                    <div class="flex justify-between text-sm mt-2 pt-1 border-t border-dotted border-slate-300 font-bold text-blue-600">
+                        <span>Total:</span><span>${kelasGroups[k].Total}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('siswa-table-body');
+            tbody.innerHTML = data.map(s => `
+                <tr class="hover:bg-blue-50 transition-colors cursor-pointer group" onclick="openNisModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+                    <td class="px-6 py-4 font-medium">${s.Nama}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-2 py-1 rounded text-xs font-bold ${s.JK === 'L' ? 'bg-indigo-100 text-indigo-700' : 'bg-pink-100 text-pink-700'}">${s.JK}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center text-gray-600">${s.Kelas}</td>
+                    <td class="px-6 py-4 text-center text-blue-600 font-semibold text-xs">Lihat Detail</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            renderTable(allSiswaData.filter(s => s.Nama.toLowerCase().includes(val) || s.Kelas.toLowerCase().includes(val)));
+        });
+
+        function openNisModal(s) {
+            selectedSiswa = s;
+            document.getElementById('target-siswa-name').innerText = s.Nama;
+            document.getElementById('nis-verify-input').value = '';
+            document.getElementById('nis-modal').classList.remove('hidden');
+        }
+
+        function closeNisModal() { document.getElementById('nis-modal').classList.add('hidden'); }
+
+        function verifyNis() {
+            if(document.getElementById('nis-verify-input').value.trim() === selectedSiswa.NIS.trim()) {
+                closeNisModal();
+                showDetail(selectedSiswa);
+            } else {
+                document.getElementById('nis-error').classList.remove('hidden');
+            }
+        }
+
+        function showDetail(s) {
+            const container = document.getElementById('detail-content');
+            container.innerHTML = `
+                <div class="bg-white border rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-blue-600 p-8 text-white"><h1 class="text-3xl font-bold">${s.Nama}</h1><p>NIS: ${s.NIS} | NISN: ${s.NISN}</p></div>
+                    <div class="p-8 space-y-8">
+                        <div><h3 class="font-bold border-b mb-4 text-blue-600 uppercase text-sm tracking-widest">Identitas Pribadi</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            ${field("JK", s.JK)} ${field("Tempat Tgl Lahir", s["Tempat Tanggal Lahir"])} ${field("NIK", s.NIK)}
+                            ${field("Agama", s.Agama)} ${field("HP", s.HP)} ${field("Asal Sekolah", s["Sekolah Asal"])}
+                            ${field("Alamat", s["Alamat Lengkap"])} ${field("Anak ke", s["Anak ke-berapa"])} ${field("No KK", s["No KK"])}
+                        </div></div>
+                        <div><h3 class="font-bold border-b mb-4 text-blue-600 uppercase text-sm tracking-widest">Orang Tua / Wali</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-slate-50 p-4 rounded-lg"><strong>Ayah:</strong> ${s["Nama (Ayah)"]} (${s["Pekerjaan (Ayah)"]})</div>
+                            <div class="bg-slate-50 p-4 rounded-lg"><strong>Ibu:</strong> ${s["Nama (Ibu)"]} (${s["Pekerjaan (Ibu)"]})</div>
+                        </div></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detail-panel').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function field(l, v) { return `<div class="mb-2"><label class="text-[10px] text-gray-400 font-bold uppercase block">${l}</label><p class="font-semibold">${v || "-"}</p></div>`; }
+        function closeDetail() { document.getElementById('detail-panel').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function logout() { location.reload(); }
+    </script>
+</body>
+</html>
