@@ -3,203 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Data Siswa</title>
+    <title>PROFIL MURID SPENFORMA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .nav-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .sidebar { transition: all 0.3s ease; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            letter-spacing: -0.01em;
+        }
+
+        /* Tema Hijau Daun kustom */
+        .nav-link.active { 
+            background-color: #ecfdf5; 
+            color: #059669; 
+            border-right: 4px solid #059669; 
+        }
+        
+        .sidebar { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Tipografi yang lebih halus */
+        h1, h2, h3 { letter-spacing: -0.02em; }
+        
         @media print {
             .no-print { display: none !important; }
             .sidebar { display: none !important; }
-            main { margin-left: 0 !important; width: 100% !important; }
+            main { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+            .print-break { page-break-before: always; }
         }
-        #mobile-overlay { background: rgba(0, 0, 0, 0.5); }
+        
+        #mobile-overlay { background: rgba(6, 78, 59, 0.4); backdrop-filter: blur(4px); }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+
+        .user-icon-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex">
+<body class="bg-emerald-50/30 text-slate-800 min-h-screen flex">
 
     <!-- LOGIN PAGE -->
-    <div id="login-page" class="fixed inset-0 flex items-center justify-center z-[100] bg-blue-600 px-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+    <div id="login-page" class="fixed inset-0 flex items-center justify-center z-[100] bg-emerald-700 px-4">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
-                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-school text-blue-600 text-2xl"></i>
+                <!-- LOGO GANTI DENGAN IKON USER -->
+                <div class="w-24 h-24 user-icon-gradient rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg border-4 border-emerald-50">
+                    <i class="fas fa-user-graduate text-white text-4xl"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-800">Login Sistem</h1>
-                <p class="text-gray-500">Masukkan NPSN untuk mengakses data</p>
+                <!-- TEXT JADI HURUF BESAR SEMUA -->
+                <h1 class="text-2xl font-extrabold text-slate-900 mb-2 uppercase">PROFIL MURID SPENFORMA</h1>
+                <p class="text-slate-500 text-sm">Silakan masuk menggunakan NPSN</p>
             </div>
-            <form id="login-form" class="space-y-4">
+            <form id="login-form" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Password (NPSN)</label>
+                    <!-- LABEL TENGAH -->
+                    <label class="block text-sm font-bold text-slate-700 mb-3 text-center uppercase tracking-widest">Pasword</label>
                     <input type="password" id="npsn-input" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        class="w-full px-5 py-3.5 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all text-lg tracking-widest text-center bg-slate-50"
                         placeholder="••••••••">
                 </div>
+                <!-- TOMBOL MASUK -->
                 <button type="submit" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
-                    Masuk Ke Dashboard
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-200 text-base uppercase tracking-widest">
+                    Masuk
                 </button>
             </form>
-            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden">NPSN salah. Silakan coba lagi.</p>
+            <p id="login-error" class="text-red-500 text-xs mt-5 text-center hidden font-bold">NPSN tidak terdaftar. Periksa kembali.</p>
         </div>
     </div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 lg:static no-print hidden">
+    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-emerald-100 transform -translate-x-full lg:translate-x-0 lg:static no-print hidden">
         <div class="flex flex-col h-full">
-            <div class="h-16 flex items-center px-6 border-b border-gray-100">
-                <i class="fas fa-graduation-cap text-blue-600 text-2xl mr-3"></i>
-                <span class="text-xl font-bold text-slate-800 tracking-tight">EduData</span>
+            <div class="h-20 flex items-center px-8">
+                <div class="w-10 h-10 user-icon-gradient rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                    <i class="fas fa-user-graduate text-white text-lg"></i>
+                </div>
+                <span class="text-xl font-extrabold text-emerald-900 uppercase">SPENFORMA</span>
             </div>
             
-            <nav class="flex-1 py-6 space-y-1">
-                <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-all active">
-                    <i class="fas fa-th-large w-5 mr-3"></i>
-                    <span class="font-medium">Dashboard</span>
+            <nav class="flex-1 py-4 space-y-1">
+                <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-link w-full flex items-center px-8 py-3.5 text-slate-600 hover:bg-emerald-50 transition-all active">
+                    <i class="fas fa-chart-pie w-5 mr-3 text-lg"></i>
+                    <span class="font-semibold text-[15px] uppercase">Dashboard</span>
                 </button>
-                <button onclick="switchPage('siswa')" id="nav-siswa" class="nav-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-user-friends w-5 mr-3"></i>
-                    <span class="font-medium">Daftar Siswa</span>
+                <button onclick="switchPage('siswa')" id="nav-siswa" class="nav-link w-full flex items-center px-8 py-3.5 text-slate-600 hover:bg-emerald-50 transition-all">
+                    <i class="fas fa-address-book w-5 mr-3 text-lg"></i>
+                    <span class="font-semibold text-[15px] uppercase">Daftar Siswa</span>
                 </button>
-                <button onclick="switchPage('perkelas')" id="nav-perkelas" class="nav-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-all">
-                    <i class="fas fa- chalkboard w-5 mr-3"></i>
-                    <span class="font-medium">Data per Kelas</span>
+                <button onclick="switchPage('perkelas')" id="nav-perkelas" class="nav-link w-full flex items-center px-8 py-3.5 text-slate-600 hover:bg-emerald-50 transition-all">
+                    <i class="fas fa-layer-group w-5 mr-3 text-lg"></i>
+                    <span class="font-semibold text-[15px] uppercase">Data per Kelas</span>
                 </button>
             </nav>
 
-            <div class="p-4 border-t border-gray-100">
-                <button onclick="logout()" class="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                    <i class="fas fa-sign-out-alt w-5 mr-3"></i>
-                    <span class="font-medium">Keluar</span>
+            <div class="p-6">
+                <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all font-bold text-sm uppercase">
+                    <i class="fas fa-power-off mr-2"></i> Keluar
                 </button>
             </div>
         </div>
     </aside>
 
-    <!-- MOBILE OVERLAY -->
     <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 z-40 hidden lg:hidden no-print"></div>
 
-    <!-- MAIN CONTENT AREA -->
+    <!-- MAIN CONTENT -->
     <div id="main-app" class="flex-1 flex flex-col min-w-0 hidden">
-        <!-- Header Mobile -->
-        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30 no-print">
-            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                <i class="fas fa-bars text-xl"></i>
+        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-emerald-50 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30 no-print">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-emerald-700 hover:bg-emerald-50 rounded-xl">
+                <i class="fas fa-bars-staggered text-xl"></i>
             </button>
             <div class="flex items-center space-x-4">
                 <div class="text-right hidden sm:block">
-                    <p class="text-xs text-gray-400 font-bold uppercase">Administrator</p>
-                    <p class="text-sm font-medium text-gray-700" id="user-name-display">Operator Sekolah</p>
+                    <p class="text-[10px] text-emerald-600 font-extrabold uppercase tracking-widest">Akses Administrator</p>
+                    <p class="text-sm font-bold text-slate-700 uppercase">Operator Sekolah</p>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
-                    A
+                <div class="w-10 h-10 rounded-xl user-icon-gradient flex items-center justify-center text-white font-bold shadow-md">
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
         </header>
 
-        <main class="p-4 lg:p-8 overflow-y-auto">
+        <main class="p-6 lg:p-10 max-w-[1600px] mx-auto w-full">
             
             <!-- DASHBOARD SECTION -->
             <section id="page-dashboard" class="page-content">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-slate-800">Dashboard</h2>
-                    <p class="text-gray-500">Ringkasan statistik data siswa saat ini.</p>
+                <div class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2 uppercase">Statistik Utama</h2>
+                    <p class="text-slate-500 text-base font-medium">Gambaran umum populasi siswa saat ini.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                    <div class="bg-white p-7 rounded-3xl shadow-sm border border-emerald-50 group hover:border-emerald-200 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400 font-extrabold uppercase tracking-wider mb-2">Total Siswa</p>
+                                <h3 id="stat-total" class="text-4xl font-black text-slate-800">0</h3>
+                            </div>
+                            <div class="p-5 bg-emerald-50 text-emerald-600 rounded-2xl group-hover:scale-110 transition-transform"><i class="fas fa-users-viewfinder text-2xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-7 rounded-3xl shadow-sm border border-emerald-50 group hover:border-emerald-200 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400 font-extrabold uppercase tracking-wider mb-2">Siswa Laki-laki</p>
+                                <h3 id="stat-laki" class="text-4xl font-black text-slate-800">0</h3>
+                            </div>
+                            <div class="p-5 bg-blue-50 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform"><i class="fas fa-mars text-2xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-7 rounded-3xl shadow-sm border border-emerald-50 group hover:border-emerald-200 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400 font-extrabold uppercase tracking-wider mb-2">Siswa Perempuan</p>
+                                <h3 id="stat-perempuan" class="text-4xl font-black text-slate-800">0</h3>
+                            </div>
+                            <div class="p-5 bg-rose-50 text-rose-600 rounded-2xl group-hover:scale-110 transition-transform"><i class="fas fa-venus text-2xl"></i></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <div><p class="text-sm text-gray-400 font-bold uppercase mb-1">Total Siswa</p><h3 id="stat-total" class="text-3xl font-bold text-gray-800">0</h3></div>
-                            <div class="p-4 bg-blue-50 text-blue-600 rounded-2xl"><i class="fas fa-users text-2xl"></i></div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <div><p class="text-sm text-gray-400 font-bold uppercase mb-1">Laki-laki</p><h3 id="stat-laki" class="text-3xl font-bold text-gray-800">0</h3></div>
-                            <div class="p-4 bg-indigo-50 text-indigo-600 rounded-2xl"><i class="fas fa-mars text-2xl"></i></div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <div><p class="text-sm text-gray-400 font-bold uppercase mb-1">Perempuan</p><h3 id="stat-perempuan" class="text-3xl font-bold text-gray-800">0</h3></div>
-                            <div class="p-4 bg-pink-50 text-pink-600 rounded-2xl"><i class="fas fa-venus text-2xl"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold mb-6 flex items-center">
-                        <span class="w-1.5 h-6 bg-blue-600 rounded-full mr-3"></span>
-                        Statistik per Kelas
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-emerald-50">
+                    <h3 class="text-xl font-extrabold mb-8 flex items-center text-slate-800 uppercase">
+                        <span class="w-2 h-7 bg-emerald-500 rounded-full mr-4"></span> 
+                        Distribusi Siswa per Kelas
                     </h3>
-                    <div id="stats-per-kelas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                    <div id="stats-per-kelas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
                 </div>
             </section>
 
             <!-- DAFTAR SISWA SECTION -->
             <section id="page-siswa" class="page-content hidden">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Daftar Identitas</h2>
-                        <p class="text-gray-500 text-sm">Klik baris untuk memverifikasi dan melihat profil lengkap.</p>
+                        <h2 class="text-3xl font-extrabold text-slate-900 mb-2 uppercase">Database Siswa</h2>
+                        <p class="text-slate-500 font-medium text-base">Cari dan kelola data identitas lengkap siswa.</p>
                     </div>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search-input" class="pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 w-full md:w-96 outline-none bg-white shadow-sm" placeholder="Cari Nama atau Kelas...">
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-emerald-400 group-focus-within:text-emerald-600 transition-colors">
+                            <i class="fas fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="search-input" class="pl-14 pr-6 py-4 border border-emerald-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 w-full lg:w-[450px] outline-none bg-white shadow-sm transition-all font-medium text-[15px]" placeholder="Cari berdasarkan nama, NIS, atau kelas...">
                     </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                
+                <div class="bg-white rounded-3xl shadow-sm border border-emerald-50 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="bg-gray-50 border-b border-gray-100">
+                            <thead class="bg-emerald-50/50 border-b border-emerald-100">
                                 <tr>
-                                    <th class="px-8 py-4 font-bold text-xs uppercase text-gray-400 tracking-wider">Nama Lengkap</th>
-                                    <th class="px-6 py-4 font-bold text-xs uppercase text-gray-400 tracking-wider text-center">JK</th>
-                                    <th class="px-6 py-4 font-bold text-xs uppercase text-gray-400 tracking-wider text-center">Kelas</th>
-                                    <th class="px-8 py-4 font-bold text-xs uppercase text-gray-400 tracking-wider text-right">Aksi</th>
+                                    <th class="px-8 py-5 font-extrabold text-xs uppercase text-emerald-800 tracking-widest">Nama Lengkap & Identitas</th>
+                                    <th class="px-6 py-5 font-extrabold text-xs uppercase text-emerald-800 tracking-widest text-center">JK</th>
+                                    <th class="px-6 py-5 font-extrabold text-xs uppercase text-emerald-800 tracking-widest text-center">Kelas</th>
+                                    <th class="px-8 py-5 font-extrabold text-xs uppercase text-emerald-800 tracking-widest text-right">Tindakan</th>
                                 </tr>
                             </thead>
-                            <tbody id="siswa-table-body" class="divide-y divide-gray-50"></tbody>
+                            <tbody id="siswa-table-body" class="divide-y divide-emerald-50"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- DATA PER KELAS SECTION -->
+            <!-- PER KELAS SECTION -->
             <section id="page-perkelas" class="page-content hidden">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 no-print">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Laporan per Kelas</h2>
-                        <p class="text-gray-500 text-sm">Data lengkap per rombel untuk keperluan administrasi.</p>
-                    </div>
-                    <div class="flex space-x-3">
-                        <select id="class-filter" class="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white shadow-sm font-medium">
-                            <option value="">-- Pilih Kelas --</option>
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6 no-print">
+                    <h2 class="text-3xl font-extrabold text-slate-900 uppercase">Rekapitulasi Kelas</h2>
+                    <div class="flex flex-wrap gap-4">
+                        <select id="class-filter" class="px-6 py-3.5 border border-emerald-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none bg-white shadow-sm font-bold text-slate-700 text-sm uppercase">
+                            <option value="">Pilih Rombongan Belajar</option>
                         </select>
-                        <button onclick="window.print()" class="px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 rounded-xl shadow-sm font-bold text-gray-600">
-                            <i class="fas fa-print mr-2"></i> Cetak
+                        <button onclick="window.print()" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-100 transition-all flex items-center text-sm uppercase">
+                            <i class="fas fa-print mr-3"></i> Cetak Laporan
                         </button>
                     </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-[11px] sm:text-xs">
-                            <thead class="bg-slate-800 text-white">
+                        <table class="w-full text-left text-[12px]">
+                            <thead class="bg-emerald-900 text-white">
                                 <tr>
-                                    <th class="px-4 py-4 border-r border-slate-700">Nama</th>
-                                    <th class="px-2 py-4 text-center border-r border-slate-700">JK</th>
-                                    <th class="px-4 py-4 text-center border-r border-slate-700">NIS</th>
-                                    <th class="px-4 py-4 text-center border-r border-slate-700">NISN</th>
-                                    <th class="px-4 py-4 border-r border-slate-700">Asal Sekolah</th>
-                                    <th class="px-4 py-4">Tempat Tanggal Lahir</th>
+                                    <th class="px-5 py-5 border-r border-emerald-800 font-bold uppercase tracking-wider">Nama Peserta Didik</th>
+                                    <th class="px-2 py-5 text-center border-r border-emerald-800 font-bold uppercase tracking-wider">JK</th>
+                                    <th class="px-4 py-5 text-center border-r border-emerald-800 font-bold uppercase tracking-wider">NIS / NISN</th>
+                                    <th class="px-5 py-5 border-r border-emerald-800 font-bold uppercase tracking-wider">Asal Sekolah</th>
+                                    <th class="px-5 py-5 font-bold uppercase tracking-wider">Tempat, Tanggal Lahir</th>
                                 </tr>
                             </thead>
-                            <tbody id="perkelas-table-body" class="divide-y divide-gray-100">
-                                <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400 italic">Pilih kelas di atas untuk menampilkan data.</td></tr>
+                            <tbody id="perkelas-table-body" class="divide-y divide-slate-100">
+                                <tr><td colspan="5" class="px-10 py-20 text-center text-slate-400 font-medium italic">Silakan pilih kelas melalui menu dropdown di atas.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -208,29 +245,35 @@
         </main>
     </div>
 
-    <!-- MODAL & DETAIL -->
+    <!-- NIS VERIFICATION MODAL -->
     <div id="nis-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 hidden">
-        <div class="modal-overlay absolute inset-0"></div>
-        <div class="bg-white p-8 rounded-2xl shadow-2xl relative z-10 w-full max-w-sm">
-            <h3 class="text-xl font-bold mb-2">Verifikasi Data</h3>
-            <p class="text-gray-500 text-sm mb-6">Masukkan NIS <span id="target-siswa-name" class="font-bold text-blue-600"></span> untuk membuka akses detail.</p>
-            <input type="text" id="nis-verify-input" class="w-full px-4 py-3 border border-gray-200 rounded-xl mb-6 outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 font-mono text-center text-lg tracking-widest" placeholder="NOMOR INDUK">
-            <div class="flex space-x-3">
-                <button onclick="closeNisModal()" class="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-all">Batal</button>
-                <button onclick="verifyNis()" class="flex-1 py-3 bg-blue-600 text-white font-bold hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 transition-all">Verifikasi</button>
+        <div class="fixed inset-0 bg-emerald-950/60 backdrop-blur-sm" onclick="closeNisModal()"></div>
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl relative z-10 w-full max-w-sm">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-halved text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 uppercase">Otentikasi NIS</h3>
+                <p class="text-slate-500 text-sm mt-2">Data <span id="target-siswa-name" class="font-bold text-emerald-600 uppercase"></span> bersifat terbatas.</p>
             </div>
-            <p id="nis-error" class="text-red-500 text-xs mt-4 hidden text-center font-bold italic"><i class="fas fa-exclamation-triangle mr-1"></i> NIS tidak cocok!</p>
+            <input type="text" id="nis-verify-input" class="w-full px-5 py-4 border border-emerald-100 rounded-2xl mb-6 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 bg-emerald-50/50 font-mono text-center text-xl font-black tracking-widest" placeholder="NOMOR INDUK">
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="closeNisModal()" class="py-4 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition-all text-sm uppercase">Batal</button>
+                <button onclick="verifyNis()" class="py-4 bg-emerald-600 text-white font-bold hover:bg-emerald-700 rounded-2xl shadow-lg shadow-emerald-100 transition-all text-sm uppercase tracking-wider">Buka Data</button>
+            </div>
+            <p id="nis-error" class="text-red-500 text-xs mt-4 hidden text-center font-bold italic">Nomor Induk Siswa tidak valid!</p>
         </div>
     </div>
 
-    <div id="detail-panel" class="fixed inset-0 z-[100] bg-slate-50 overflow-y-auto hidden">
-        <div class="max-w-4xl mx-auto p-4 sm:p-8">
+    <!-- DETAIL PANEL -->
+    <div id="detail-panel" class="fixed inset-0 z-[100] bg-emerald-50/50 overflow-y-auto hidden">
+        <div class="max-w-5xl mx-auto p-4 sm:p-10">
             <div class="flex items-center justify-between mb-8 no-print">
-                <button onclick="closeDetail()" class="flex items-center text-blue-600 font-bold bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-100">
-                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                <button onclick="closeDetail()" class="flex items-center text-emerald-700 font-bold bg-white px-6 py-3 rounded-2xl shadow-sm border border-emerald-100 hover:bg-emerald-50 transition-all uppercase text-xs">
+                    <i class="fas fa-chevron-left mr-3"></i> Kembali
                 </button>
-                <button onclick="window.print()" class="px-5 py-2.5 bg-slate-800 text-white font-bold rounded-xl shadow-lg">
-                    <i class="fas fa-print mr-2"></i> Cetak Profil
+                <button onclick="window.print()" class="px-7 py-3 bg-emerald-900 text-white font-bold rounded-2xl shadow-xl hover:bg-emerald-950 transition-all flex items-center uppercase text-xs">
+                    <i class="fas fa-print mr-3"></i> Cetak Profil
                 </button>
             </div>
             <div id="detail-content"></div>
@@ -259,7 +302,6 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
             const isHidden = sidebar.classList.contains('-translate-x-full');
-            
             if (isHidden) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -274,8 +316,6 @@
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById('page-' + pageId).classList.remove('hidden');
             document.getElementById('nav-' + pageId).classList.add('active');
-            
-            // Auto close sidebar on mobile after selection
             if (window.innerWidth < 1024) toggleSidebar();
         }
 
@@ -298,7 +338,7 @@
             classes.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c;
-                opt.innerText = "Kelas " + c;
+                opt.innerText = "Siswa Kelas " + c;
                 select.appendChild(opt);
             });
             select.addEventListener('change', (e) => renderPerKelasTable(e.target.value));
@@ -306,19 +346,18 @@
 
         function renderPerKelasTable(className) {
             const tbody = document.getElementById('perkelas-table-body');
-            if(!className) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400 italic">Pilih kelas di atas untuk menampilkan data.</td></tr>';
-                return;
-            }
+            if(!className) { tbody.innerHTML = '<tr><td colspan="5" class="px-10 py-20 text-center text-slate-400 font-medium italic uppercase">Silakan pilih kelas.</td></tr>'; return; }
             const filtered = allSiswaData.filter(s => s.Kelas === className);
             tbody.innerHTML = filtered.map(s => `
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-4 py-4 border-r border-gray-50 font-bold text-gray-800">${s.Nama}</td>
-                    <td class="px-2 py-4 text-center border-r border-gray-50">${s.JK}</td>
-                    <td class="px-4 py-4 text-center border-r border-gray-50 font-mono text-blue-600">${s.NIS}</td>
-                    <td class="px-4 py-4 text-center border-r border-gray-50 font-mono text-slate-500">${s.NISN}</td>
-                    <td class="px-4 py-4 border-r border-gray-50">${s["Sekolah Asal"] || "-"}</td>
-                    <td class="px-4 py-4">${s["Tempat Tanggal Lahir"] || "-"}</td>
+                <tr class="hover:bg-emerald-50/30 transition-colors">
+                    <td class="px-5 py-4 border-r border-slate-50 font-bold text-slate-800 uppercase">${s.Nama}</td>
+                    <td class="px-2 py-4 text-center border-r border-slate-50 font-semibold text-slate-600">${s.JK}</td>
+                    <td class="px-4 py-4 text-center border-r border-slate-50">
+                        <div class="font-mono text-emerald-700 font-bold">${s.NIS}</div>
+                        <div class="font-mono text-[10px] text-slate-400">${s.NISN}</div>
+                    </td>
+                    <td class="px-5 py-4 border-r border-slate-50 font-medium text-slate-600 uppercase">${s["Sekolah Asal"] || "-"}</td>
+                    <td class="px-5 py-4 font-medium text-slate-500 uppercase">${s["Tempat Tanggal Lahir"] || "-"}</td>
                 </tr>
             `).join('');
         }
@@ -328,30 +367,34 @@
             document.getElementById('stat-laki').innerText = data.filter(s => s.JK === 'L').length;
             document.getElementById('stat-perempuan').innerText = data.filter(s => s.JK === 'P').length;
 
-            const kelasGroups = {};
+            const groups = {};
             data.forEach(s => {
                 const k = s.Kelas || "N/A";
-                if (!kelasGroups[k]) kelasGroups[k] = { L: 0, P: 0, Total: 0 };
-                kelasGroups[k].Total++;
-                if (s.JK === 'L') kelasGroups[k].L++; else if (s.JK === 'P') kelasGroups[k].P++;
+                if (!groups[k]) groups[k] = { L: 0, P: 0, Total: 0 };
+                groups[k].Total++;
+                if (s.JK === 'L') groups[k].L++; else if (s.JK === 'P') groups[k].P++;
             });
 
             const container = document.getElementById('stats-per-kelas');
-            container.innerHTML = Object.keys(kelasGroups).sort().map(k => `
-                <div class="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div class="font-bold text-slate-800 mb-3 border-b border-gray-50 pb-2 flex items-center">
-                        <i class="fas fa-tag text-blue-400 mr-2 text-xs"></i> Kelas ${k}
+            container.innerHTML = Object.keys(groups).sort().map(k => `
+                <div class="bg-emerald-50/50 border border-emerald-100 p-6 rounded-3xl hover:bg-white hover:shadow-xl hover:shadow-emerald-100 transition-all cursor-default">
+                    <div class="font-bold text-emerald-900 mb-4 border-b border-emerald-100 pb-3 flex items-center justify-between uppercase">
+                        <span class="text-base">Kelas ${k}</span>
+                        <i class="fas fa-folder-open text-emerald-300"></i>
                     </div>
-                    <div class="flex justify-between text-xs mb-1.5">
-                        <span class="text-gray-400 font-bold uppercase">Laki-laki</span>
-                        <span class="font-bold text-slate-700">${kelasGroups[k].L}</span>
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <div class="bg-white/60 p-2 rounded-xl text-center">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Lk</p>
+                            <p class="text-lg font-black text-blue-600">${groups[k].L}</p>
+                        </div>
+                        <div class="bg-white/60 p-2 rounded-xl text-center">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Pr</p>
+                            <p class="text-lg font-black text-rose-600">${groups[k].P}</p>
+                        </div>
                     </div>
-                    <div class="flex justify-between text-xs mb-3">
-                        <span class="text-gray-400 font-bold uppercase">Perempuan</span>
-                        <span class="font-bold text-slate-700">${kelasGroups[k].P}</span>
-                    </div>
-                    <div class="flex justify-between text-sm pt-2 border-t border-dotted border-gray-200 font-black text-blue-600">
-                        <span>TOTAL</span><span>${kelasGroups[k].Total}</span>
+                    <div class="flex justify-between items-center pt-2 px-1">
+                        <span class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-tighter">Total</span>
+                        <span class="text-xl font-black text-emerald-800">${groups[k].Total}</span>
                     </div>
                 </div>
             `).join('');
@@ -360,21 +403,19 @@
         function renderTable(data) {
             const tbody = document.getElementById('siswa-table-body');
             tbody.innerHTML = data.map(s => `
-                <tr class="hover:bg-blue-50/50 transition-colors cursor-pointer group" onclick="openNisModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+                <tr class="hover:bg-emerald-50/40 transition-all cursor-pointer group" onclick="openNisModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">
                     <td class="px-8 py-5">
-                        <div class="font-bold text-gray-800">${s.Nama}</div>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Siswa Terdaftar</div>
+                        <div class="font-bold text-slate-900 text-[15px] mb-0.5 group-hover:text-emerald-700 transition-colors uppercase">${s.Nama}</div>
+                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">NIS: ${s.NIS} • NISN: ${s.NISN}</div>
                     </td>
                     <td class="px-6 py-5 text-center">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs ${s.JK === 'L' ? 'bg-indigo-100 text-indigo-700' : 'bg-pink-100 text-pink-700'}">${s.JK}</span>
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl font-black text-sm ${s.JK === 'L' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}">${s.JK}</span>
                     </td>
                     <td class="px-6 py-5 text-center">
-                        <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">${s.Kelas}</span>
+                        <span class="bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-xl text-xs font-black border border-emerald-100">${s.Kelas}</span>
                     </td>
                     <td class="px-8 py-5 text-right">
-                        <button class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 opacity-0 group-hover:opacity-100 transition-all">
-                            Detail
-                        </button>
+                        <button class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all shadow-md">Detail</button>
                     </td>
                 </tr>
             `).join('');
@@ -382,7 +423,7 @@
 
         document.getElementById('search-input').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
-            renderTable(allSiswaData.filter(s => s.Nama.toLowerCase().includes(val) || s.Kelas.toLowerCase().includes(val)));
+            renderTable(allSiswaData.filter(s => s.Nama.toLowerCase().includes(val) || s.NIS.includes(val) || s.Kelas.toLowerCase().includes(val)));
         });
 
         function openNisModal(s) {
@@ -392,7 +433,6 @@
             document.getElementById('nis-modal').classList.remove('hidden');
             document.getElementById('nis-verify-input').focus();
         }
-
         function closeNisModal() { document.getElementById('nis-modal').classList.add('hidden'); }
 
         function verifyNis() {
@@ -401,56 +441,132 @@
                 showDetail(selectedSiswa);
             } else {
                 document.getElementById('nis-error').classList.remove('hidden');
+                setTimeout(() => document.getElementById('nis-error').classList.add('hidden'), 2500);
             }
         }
 
         function showDetail(s) {
             const container = document.getElementById('detail-content');
             container.innerHTML = `
-                <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-xl">
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-10 text-white">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-2">Profil Lengkap Siswa</p>
-                        <h1 class="text-4xl font-black mb-3">${s.Nama}</h1>
-                        <div class="flex flex-wrap gap-4 text-sm font-medium opacity-90">
-                            <span class="bg-white/20 px-3 py-1 rounded-lg">NIS: ${s.NIS}</span>
-                            <span class="bg-white/20 px-3 py-1 rounded-lg">NISN: ${s.NISN}</span>
-                            <span class="bg-white/20 px-3 py-1 rounded-lg">KELAS: ${s.Kelas}</span>
+                <div class="bg-white border border-emerald-100 rounded-[2.5rem] overflow-hidden shadow-2xl mb-12">
+                    <div class="bg-gradient-to-br from-emerald-800 to-green-950 p-10 sm:p-14 text-white relative">
+                        <div class="absolute top-0 right-0 p-10 opacity-10 rotate-12">
+                            <i class="fas fa-leaf text-[150px]"></i>
+                        </div>
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3">Arsip Digital Murid SPENFORMA</p>
+                                <h1 class="text-4xl sm:text-5xl font-black mb-6 leading-tight uppercase">${s.Nama}</h1>
+                                <div class="flex flex-wrap gap-4 font-bold">
+                                    <span class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-xs border border-white/20">NIS: ${s.NIS}</span>
+                                    <span class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-xs border border-white/20">NISN: ${s.NISN}</span>
+                                    <span class="bg-emerald-500 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider">Kelas: ${s.Kelas}</span>
+                                </div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/10 text-center min-w-[150px]">
+                                <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest mb-1">Status JK</p>
+                                <p class="text-3xl font-black text-emerald-300 uppercase">${s.JK === 'L' ? 'Laki-laki' : 'Perempuan'}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-10 space-y-12">
+
+                    <div class="p-8 sm:p-14 space-y-16 bg-white">
                         <section>
-                            <h3 class="font-black text-xs text-blue-600 uppercase tracking-[0.2em] mb-6 flex items-center">
-                                <i class="fas fa-id-card mr-3"></i> Biodata Siswa
+                            <h3 class="flex items-center text-sm font-black text-emerald-700 uppercase tracking-[0.2em] mb-10">
+                                <span class="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center mr-4 text-emerald-600 shadow-sm"><i class="fas fa-user-tag"></i></span>
+                                Biodata Lengkap
                             </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                ${field("Jenis Kelamin", s.JK)}
-                                ${field("Tempat Tgl Lahir", s["Tempat Tanggal Lahir"])}
-                                ${field("NIK", s.NIK)}
-                                ${field("Agama", s.Agama)}
-                                ${field("No. Handphone", s.HP)}
-                                ${field("Asal Sekolah", s["Sekolah Asal"])}
-                                ${field("Anak Ke-", s["Anak ke-berapa"])}
-                                ${field("Alamat Lengkap", s["Alamat Lengkap"])}
-                                ${field("Nomor KK", s["No KK"])}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-14">
+                                ${field("NIK / No. Identitas", s.NIK)}
+                                ${field("Tempat, Tanggal Lahir", s["Tempat Tanggal Lahir"])}
+                                ${field("Keyakinan (Agama)", s.Agama)}
+                                ${field("Kontak Seluler (HP)", s.HP)}
+                                ${field("Jenis Domisili", s["Jenis Tinggal"])}
+                                ${field("Asal Sekolah Terakhir", s["Sekolah Asal"])}
+                                ${field("Posisi Anak Ke-", s["Anak ke-berapa"])}
+                                ${field("Nomor Kartu Keluarga", s["No KK"])}
+                                ${field("Alamat Domisili Lengkap", s["Alamat Lengkap"], "col-span-1 sm:col-span-2 lg:col-span-3")}
                             </div>
                         </section>
-                        <section>
-                            <h3 class="font-black text-xs text-blue-600 uppercase tracking-[0.2em] mb-6 flex items-center">
-                                <i class="fas fa-users mr-3"></i> Orang Tua & Wali
+
+                        <section class="pt-12 border-t border-emerald-50">
+                            <h3 class="flex items-center text-sm font-black text-indigo-700 uppercase tracking-[0.2em] mb-10">
+                                <span class="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center mr-4 text-indigo-600 shadow-sm"><i class="fas fa-people-roof"></i></span>
+                                Informasi Orang Tua Kandung
                             </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
-                                    <p class="text-[10px] font-black text-indigo-500 uppercase mb-4 tracking-wider">Ayah Kandung</p>
-                                    <p class="text-xl font-bold text-gray-800 mb-1">${s["Nama (Ayah)"]}</p>
-                                    <p class="text-sm text-gray-500 font-medium">${s["Pekerjaan (Ayah)"]}</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 relative group transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-100">
+                                    <div class="absolute -top-3 left-8 px-4 py-1 bg-blue-600 text-white text-[10px] font-black uppercase rounded-full tracking-widest shadow-lg">Ayah Kandung</div>
+                                    <div class="space-y-6">
+                                        <p class="text-2xl font-black text-slate-900 uppercase">${s["Nama (Ayah)"] || "-"}</p>
+                                        <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+                                            ${fieldDetail("NIK", s["NIK (Ayah)"])}
+                                            ${fieldDetail("Thn Lahir", s["Tahun Lahir (Ayah)"])}
+                                            ${fieldDetail("Pendidikan", s["Jenjang Pendidikan (Ayah)"])}
+                                            ${fieldDetail("Pekerjaan", s["Pekerjaan (Ayah)"])}
+                                            ${fieldDetail("Penghasilan", s["Penghasilan (Ayah)"], "col-span-2")}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="bg-pink-50/50 p-6 rounded-2xl border border-pink-100">
-                                    <p class="text-[10px] font-black text-pink-500 uppercase mb-4 tracking-wider">Ibu Kandung</p>
-                                    <p class="text-xl font-bold text-gray-800 mb-1">${s["Nama (Ibu)"]}</p>
-                                    <p class="text-sm text-gray-500 font-medium">${s["Pekerjaan (Ibu)"]}</p>
+                                <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 relative group transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-100">
+                                    <div class="absolute -top-3 left-8 px-4 py-1 bg-rose-600 text-white text-[10px] font-black uppercase rounded-full tracking-widest shadow-lg">Ibu Kandung</div>
+                                    <div class="space-y-6">
+                                        <p class="text-2xl font-black text-slate-900 uppercase">${s["Nama (Ibu)"] || "-"}</p>
+                                        <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+                                            ${fieldDetail("NIK", s["NIK (Ibu)"])}
+                                            ${fieldDetail("Thn Lahir", s["Tahun Lahir (Ibu)"])}
+                                            ${fieldDetail("Pendidikan", s["Jenjang Pendidikan (Ibu)"])}
+                                            ${fieldDetail("Pekerjaan", s["Pekerjaan (Ibu)"])}
+                                            ${fieldDetail("Penghasilan", s["Penghasilan (Ibu)"], "col-span-2")}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-12 border-t border-emerald-50">
+                            <section class="lg:col-span-1">
+                                <h3 class="flex items-center text-sm font-black text-slate-800 uppercase tracking-[0.2em] mb-8">Informasi Wali</h3>
+                                <div class="bg-emerald-50/40 p-8 rounded-[2rem] border border-emerald-100/50 space-y-6">
+                                    <div>
+                                        <label class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest block mb-1">Nama Wali Siswa</label>
+                                        <p class="text-lg font-black text-slate-800 uppercase">${s["Nama (Wali)"] || "Tidak Ada Wali"}</p>
+                                    </div>
+                                    <div class="grid grid-cols-1 gap-5">
+                                        ${fieldDetail("NIK Wali", s["NIK (Wali)"])}
+                                        ${fieldDetail("Pendidikan", s["Jenjang Pendidikan (Wali)"])}
+                                        ${fieldDetail("Pekerjaan", s["Pekerjaan (Wali)"])}
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="lg:col-span-2">
+                                <h3 class="flex items-center text-sm font-black text-amber-700 uppercase tracking-[0.2em] mb-8">Kesejahteraan & Bantuan</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div class="bg-amber-50/50 p-6 rounded-2xl border border-amber-100">
+                                        ${fieldDetail("Penerima KPS", s["Penerima KPS"])}
+                                        <div class="mt-2 text-xs font-bold text-slate-500">No. KPS: ${s["No. KPS"] || "-"}</div>
+                                    </div>
+                                    <div class="bg-amber-50/50 p-6 rounded-2xl border border-amber-100">
+                                        ${fieldDetail("Penerima KIP", s["Penerima KIP"] || s["Penerima"])}
+                                        <div class="mt-2 text-xs font-bold text-slate-500">No. KIP: ${s["Nomor KIP"] || "-"}</div>
+                                    </div>
+                                    <div class="col-span-1 sm:col-span-2 bg-emerald-900 text-white p-8 rounded-3xl shadow-lg relative overflow-hidden">
+                                        <div class="absolute right-0 bottom-0 p-4 opacity-10">
+                                            <i class="fas fa-hand-holding-dollar text-7xl"></i>
+                                        </div>
+                                        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-3">Usulan Layak PIP dari Sekolah</p>
+                                        <p class="text-2xl font-black mb-4 uppercase">${s["Layak PIP (usulan dari sekolah)"] || "TIDAK DIUSULKAN"}</p>
+                                        <div class="bg-white/10 p-4 rounded-xl border border-white/10 italic text-[13px] font-medium leading-relaxed">
+                                            "Alasan: ${s["Alasan Layak PIP"] || "Tidak ada alasan spesifik"}"
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-emerald-50 px-14 py-8 border-t border-emerald-100 text-center text-[11px] text-emerald-800/50 font-bold uppercase tracking-[0.5em] no-print">
+                        Hak Cipta Digital &bull; SPENFORMA &bull; 2025
                     </div>
                 </div>
             `;
@@ -458,12 +574,20 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function field(l, v) { 
-            return `<div>
-                <label class="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">${l}</label>
-                <p class="font-bold text-gray-800 leading-snug">${v || "-"}</p>
+        function field(label, value, extraClasses = "") { 
+            return `<div class="${extraClasses}">
+                <label class="text-[10px] text-emerald-600/60 font-black uppercase tracking-widest block mb-2">${label}</label>
+                <p class="font-bold text-slate-800 text-[15px] leading-relaxed uppercase">${value || "-"}</p>
             </div>`; 
         }
+
+        function fieldDetail(label, value, extraClasses = "") {
+            return `<div class="${extraClasses}">
+                <label class="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-1">${label}</label>
+                <p class="text-[14px] font-bold text-slate-700 leading-tight uppercase">${value || "-"}</p>
+            </div>`;
+        }
+
         function closeDetail() { document.getElementById('detail-panel').classList.add('hidden'); document.body.style.overflow = 'auto'; }
         function logout() { location.reload(); }
     </script>
